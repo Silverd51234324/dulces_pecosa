@@ -9,13 +9,13 @@ class ProductController extends Controller
 {
 
     public function index()
-{
-    $products = Product::where('active', true)
-        ->orderBy('display_order')
-        ->get();
+    {
+        $products = Product::where('active', true)
+            ->orderBy('display_order')
+            ->get();
 
-    return view('products.index', compact('products'));
-}
+        return view('products.index', compact('products'));
+    }
 
 
     public function create()
@@ -25,37 +25,44 @@ class ProductController extends Controller
 
 
     public function store(Request $request)
-    {
+{
 
-        $data = $request->validate([
+    $data = $request->validate([
 
-            'name' => 'required|string|max:100',
+        'name' => 'required|string|max:100',
 
-            'type' => 'required|string',
+        'type' => 'required|string',
 
-            'purchase_amount' => 'required|numeric',
+        'purchase_amount' => 'required|numeric',
 
-            'purchase_unit' => 'required|string',
+        'purchase_unit' => 'required|string',
 
-            'production_yield' => 'required|numeric',
+        'purchase_price' => 'required|numeric',
 
-            'sale_price' => 'required|numeric',
+        'unit_quantity' => 'required|numeric',
 
-            'minimum_stock' => 'nullable|integer',
+        'unit_unit' => 'required|string',
 
-            'display_order' => 'nullable|integer',
+        'production_yield' => 'required|numeric',
 
-        ]);
+        'unit_cost' => 'required|numeric',
+
+        'sale_price' => 'required|numeric',
+
+        'profit' => 'required|numeric',
+
+    ]);
 
 
-        Product::create($data);
+    Product::create($data);
 
 
-        return redirect()
-            ->route('products.index')
-            ->with('success','Producto agregado correctamente');
+    return redirect()
+        ->route('products.index')
+        ->with('success','Producto agregado correctamente');
 
-    }
+}
+
 
 
     public function edit(Product $product)
@@ -67,52 +74,59 @@ class ProductController extends Controller
     }
 
 
+
     public function update(Request $request, Product $product)
-    {
-
-        $data = $request->validate([
-
-            'name' => 'required|string|max:100',
-
-            'type' => 'required|string',
-
-            'purchase_amount' => 'required|numeric',
-
-            'purchase_unit' => 'required|string',
-
-            'production_yield' => 'required|numeric',
-
-            'sale_price' => 'required|numeric',
-
-            'minimum_stock' => 'nullable|integer',
-
-            'display_order' => 'nullable|integer',
-
-        ]);
-
-
-        $product->update($data);
-
-
-return redirect()
-->route('products.index')
-->with('success','Producto actualizado');
-
-    }
-
-
-    public function destroy(Product $product)
 {
 
-    $product->update([
-        'active'=>false
+    $data = $request->validate([
+
+        'name' => 'required|string|max:100',
+
+        'type' => 'required|string',
+
+        'purchase_amount' => 'required|numeric',
+
+        'purchase_unit' => 'required|string',
+
+        'purchase_price' => 'required|numeric',
+
+        'unit_quantity' => 'required|numeric',
+
+        'unit_unit' => 'required|string',
+
+        'production_yield' => 'required|numeric',
+
+        'unit_cost' => 'required|numeric',
+
+        'sale_price' => 'required|numeric',
+
+        'profit' => 'required|numeric',
+
     ]);
 
 
+    $product->update($data);
+
+
     return redirect()
-    ->route('products.index')
-    ->with('success','Producto eliminado');
+        ->route('products.index')
+        ->with('success','Producto actualizado');
 
 }
+
+
+
+    public function destroy(Product $product)
+    {
+
+        $product->update([
+            'active' => false
+        ]);
+
+
+        return redirect()
+            ->route('products.index')
+            ->with('success', 'Producto eliminado');
+    }
 
 }

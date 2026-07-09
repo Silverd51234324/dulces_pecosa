@@ -56,12 +56,7 @@
 
             </a>
 
-            <a href="/productions"
-                class="block px-4 py-3 rounded-lg hover:bg-slate-800">
-
-                🏭 Producción
-
-            </a>
+            
 
             <a href="/stores"
                 class="block px-4 py-3 rounded-lg hover:bg-slate-800">

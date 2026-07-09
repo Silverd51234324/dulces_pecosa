@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\PurchaseDetailController;
-use App\Http\Controllers\ProductionController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\StoreProductController;
 use App\Http\Controllers\StoreVisitController;
@@ -35,11 +34,6 @@ Route::post(
     [PurchaseDetailController::class,'store']
 )
 ->name('purchase_details.store');
-
-Route::resource(
-    'productions',
-    ProductionController::class
-);
 
 Route::resource(
     'stores',

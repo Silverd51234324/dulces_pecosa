@@ -11,13 +11,27 @@
         </h1>
 
         <a href="{{ route('products.create') }}"
-           class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg transition">
+            class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg transition">
 
             Nuevo producto
 
         </a>
 
     </div>
+
+    <div class="flex justify-between items-center mb-6">
+
+    <div class="relative w-96">
+
+        <input
+            type="text"
+            id="searchProduct"
+            placeholder="🔍 Buscar producto..."
+            class="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 pl-4 text-white placeholder-slate-400 focus:border-green-500 focus:outline-none">
+
+    </div>
+
+</div>
 
 
     @if(session('success'))
@@ -44,19 +58,27 @@
                     </th>
 
                     <th class="p-4 text-center">
-                        Tipo
+                        Compra
                     </th>
 
                     <th class="p-4 text-center">
-                        Compra
+                        Precio Compra
                     </th>
 
                     <th class="p-4 text-center">
                         Rendimiento
                     </th>
 
-                    <th class="p-4 text-right">
-                        Precio
+                    <th class="p-4 text-center">
+                        Costo Unidad
+                    </th>
+
+                    <th class="p-4 text-center">
+                        Precio Venta
+                    </th>
+
+                    <th class="p-4 text-center">
+                        Ganancia
                     </th>
 
                     <th class="p-4 text-center">
@@ -72,57 +94,98 @@
 
                 @forelse($products as $product)
 
-                    <tr class="border-b border-slate-700 hover:bg-slate-700 transition">
+<tr
+    class="product-row border-b border-slate-700 hover:bg-slate-700 transition"
+    data-search="
+        {{ strtolower($product->name) }}
+        {{ strtolower($product->type == 'packaged' ? 'empaquetado' : 'pieza') }}
+        {{ strtolower($product->purchase_unit) }}
+        {{ $product->purchase_amount }}
+        {{ $product->purchase_price }}
+        {{ $product->sale_price }}
+    ">
 
                         <td class="p-4">
 
-                            {{ $product->name }}
+                            <div class="font-semibold">
+
+                                {{ $product->name }}
+
+                            </div>
+
+                            <div class="text-xs text-slate-400">
+
+                                {{ $product->type == 'packaged' ? 'Empaquetado' : 'Pieza' }}
+
+                            </div>
 
                         </td>
 
 
-                        <td class="p-4 text-center">
+                        <td class="text-center">
 
-                            @if($product->type == 'packaged')
-
-                                Empaquetado
-
-                            @else
-
-                                Pieza
-
-                            @endif
-
-                        </td>
-
-
-                        <td class="p-4 text-center">
-
-                            {{ $product->purchase_amount }}
+                            {{ number_format($product->purchase_amount,2) }}
 
                             {{ $product->purchase_unit }}
 
                         </td>
 
 
-                        <td class="p-4 text-center">
+                        <td class="text-center text-orange-300 font-semibold">
 
-                            {{ $product->production_yield }}
+                            ${{ number_format($product->purchase_price,2) }}
 
                         </td>
 
 
-                        <td class="p-4 text-right font-semibold text-green-400">
+                        <td class="text-center">
+
+                            {{ number_format($product->production_yield,2) }}
+
+                        </td>
+
+
+                        <td class="text-center text-yellow-300 font-semibold">
+
+                            ${{ number_format($product->unit_cost,2) }}
+
+                        </td>
+
+
+                        <td class="text-center text-cyan-300 font-semibold">
 
                             ${{ number_format($product->sale_price,2) }}
 
                         </td>
 
 
-                        <td class="p-4 text-center">
+                        <td class="text-center">
+
+                            @if($product->profit >= 0)
+
+                                <span class="text-green-400 font-bold">
+
+                                    ${{ number_format($product->profit,2) }}
+
+                                </span>
+
+                            @else
+
+                                <span class="text-red-400 font-bold">
+
+                                    ${{ number_format($product->profit,2) }}
+
+                                </span>
+
+                            @endif
+
+                        </td>
+
+
+                        <td class="text-center">
 
                             <a href="{{ route('products.edit',$product) }}"
-                               class="text-sky-400 hover:text-sky-300">
+                                class="text-sky-400 hover:text-sky-300">
 
                                 Editar
 
@@ -155,7 +218,8 @@
 
                     <tr>
 
-                        <td colspan="6" class="p-8 text-center text-slate-400">
+                        <td colspan="8"
+                            class="p-8 text-center text-slate-400">
 
                             No hay productos registrados.
 
@@ -172,5 +236,34 @@
     </div>
 
 </div>
+
+<script>
+
+const input = document.getElementById('searchProduct');
+
+const rows = document.querySelectorAll('.product-row');
+
+input.addEventListener('keyup', function(){
+
+    const text = this.value.toLowerCase();
+
+    rows.forEach(row=>{
+
+        const search = row.dataset.search;
+
+        if(search.includes(text))
+        {
+            row.style.display='';
+        }
+        else
+        {
+            row.style.display='none';
+        }
+
+    });
+
+});
+
+</script>
 
 @endsection
