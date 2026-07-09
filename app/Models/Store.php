@@ -1,0 +1,35 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Store extends Model
+{
+
+    protected $fillable = [
+
+        'name',
+        'notes'
+
+    ];
+
+
+
+    public function products()
+    {
+        return $this->hasMany(
+            StoreProduct::class
+        );
+    }
+
+
+
+    public function visits()
+    {
+        return $this->hasMany(
+            StoreVisit::class
+        );
+    }
+
+}
