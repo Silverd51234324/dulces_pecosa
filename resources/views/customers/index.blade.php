@@ -104,6 +104,13 @@
 
                     <td class="p-4 text-center">
 
+                    <a href="{{ route('customers.show',$customer) }}"
+   class="text-green-400 hover:text-green-300 mr-4">
+
+    Ver ventas
+
+</a>
+
 
 
                         

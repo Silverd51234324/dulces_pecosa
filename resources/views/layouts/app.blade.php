@@ -72,12 +72,7 @@
 
             </a>
 
-            <a href="/sales"
-                class="block px-4 py-3 rounded-lg hover:bg-slate-800">
-
-                💰 Ventas
-
-            </a>
+            
 
             <a href="/finances"
                 class="block px-4 py-3 rounded-lg hover:bg-slate-800">
@@ -117,11 +112,15 @@
 
 
         <!-- Contenido -->
-        <main class="flex-1 p-8 bg-slate-900">
+                <main class="flex-1 p-8 bg-slate-900">
 
             @yield('content')
 
         </main>
+
+
+        @stack('scripts')
+
 
     </div>
 

@@ -18,11 +18,11 @@ class SaleController extends Controller
     {
 
         $sales = Sale::with([
-    'customer',
-    'details'
-])
-->orderByDesc('sale_date')
-->get();
+            'customer',
+            'details'
+        ])
+        ->orderByDesc('sale_date')
+        ->get();
 
 
         return view(
@@ -38,12 +38,16 @@ class SaleController extends Controller
     public function create()
     {
 
-        $customers = Customer::all();
+        $customers = Customer::orderBy('name')
+            ->get();
+
 
         $products = Product::where(
             'active',
             true
-        )->get();
+        )
+        ->orderBy('name')
+        ->get();
 
 
 
@@ -57,69 +61,172 @@ class SaleController extends Controller
 
     }
 
-    public function store(Request $request)
-{
-
-    $data = $request->validate([
-
-        'customer_id'
-            => 'required|exists:customers,id',
-
-        'products'
-            => 'required|array'
-
-    ]);
 
 
 
-    $sale = Sale::create([
+    /*
+    |--------------------------------------------------------------------------
+    | Crear venta desde cliente
+    |--------------------------------------------------------------------------
+    */
 
-        'customer_id'
-            => $data['customer_id'],
-
-        'sale_date'
-            => now()
-
-    ]);
-
-
-
-    foreach($data['products'] as $product_id => $quantity)
+    public function createForCustomer(Customer $customer)
     {
 
 
-        if($quantity > 0)
-        {
+        $products = Product::where(
+            'active',
+            true
+        )
+        ->orderBy('name')
+        ->get();
 
-            $product = Product::find($product_id);
 
 
-            $sale->details()->create([
-
-                'product_id'
-                    => $product->id,
-
-                'quantity'
-                    => $quantity,
-
-                'price'
-                    => $product->sale_price
-
-            ]);
-
-        }
+        return view(
+            'sales.create_customer',
+            compact(
+                'customer',
+                'products'
+            )
+        );
 
     }
 
 
 
-    return redirect()
-        ->route('sales.index');
 
 
-}
 
-public function show(Sale $sale)
+    public function storeForCustomer(
+        Request $request,
+        Customer $customer
+    )
+    {
+
+
+        $data = $request->validate([
+
+
+            'sale_date'
+                => 'required|date',
+
+
+            'products'
+                => 'required|array',
+
+
+            'products.*.product_id'
+                => 'required|exists:products,id',
+
+
+            'products.*.quantity'
+                => 'required|numeric|min:1',
+
+
+            'products.*.price'
+                => 'required|numeric|min:0',
+
+
+        ]);
+
+
+
+
+
+        $sale = Sale::create([
+
+
+            'customer_id'
+                => $customer->id,
+
+
+            'sale_date'
+                => $data['sale_date']
+
+
+        ]);
+
+
+
+
+
+
+
+        foreach($data['products'] as $item)
+        {
+
+
+            $sale->details()->create([
+
+
+                'product_id'
+                    => $item['product_id'],
+
+
+                'quantity'
+                    => $item['quantity'],
+
+
+                'price'
+                    => $item['price']
+
+
+            ]);
+
+
+        }
+
+
+
+
+
+        return redirect()
+
+            ->route(
+                'customers.show',
+                $customer
+            )
+
+            ->with(
+                'success',
+                'Venta registrada correctamente'
+            );
+
+
+    }
+
+
+
+
+
+
+
+    public function show(Sale $sale)
+    {
+
+        $sale->load([
+
+            'customer',
+
+            'details.product'
+
+        ]);
+
+
+
+        return view(
+
+            'sales.show',
+
+            compact('sale')
+
+        );
+
+    }
+
+
+public function edit(Sale $sale)
 {
 
     $sale->load([
@@ -128,13 +235,153 @@ public function show(Sale $sale)
     ]);
 
 
+    $products = Product::where(
+        'active',
+        true
+    )
+    ->orderBy('name')
+    ->get();
+
+
+
     return view(
-        'sales.show',
-        compact('sale')
+        'sales.edit',
+        compact(
+            'sale',
+            'products'
+        )
     );
 
 }
 
+
+
+
+
+public function update(Request $request, Sale $sale)
+{
+
+    $data = $request->validate([
+
+
+        'sale_date'
+            => 'required|date',
+
+
+
+        'products'
+            => 'required|array',
+
+
+
+        'products.*.product_id'
+            => 'required|exists:products,id',
+
+
+
+        'products.*.quantity'
+            => 'required|numeric|min:1',
+
+
+
+        'products.*.price'
+            => 'required|numeric|min:0',
+
+
+    ]);
+
+
+
+
+    $sale->update([
+
+        'sale_date'
+            => $data['sale_date']
+
+    ]);
+
+
+
+    // borrar productos anteriores
+
+    $sale->details()->delete();
+
+
+
+
+    foreach($data['products'] as $item)
+    {
+
+
+        $sale->details()->create([
+
+
+            'product_id'
+                => $item['product_id'],
+
+
+            'quantity'
+                => $item['quantity'],
+
+
+            'price'
+                => $item['price']
+
+
+        ]);
+
+
+    }
+
+
+
+
+
+    return redirect()
+
+        ->route(
+            'customers.show',
+            $sale->customer
+        )
+
+        ->with(
+            'success',
+            'Venta actualizada correctamente'
+        );
+
+
+}
+
+
+
+
+
+
+
+public function destroy(Sale $sale)
+{
+
+    $customer = $sale->customer;
+
+
+    $sale->delete();
+
+
+
+    return redirect()
+
+        ->route(
+            'customers.show',
+            $customer
+        )
+
+        ->with(
+            'success',
+            'Venta eliminada correctamente'
+        );
+
+
+}
 
 
 }

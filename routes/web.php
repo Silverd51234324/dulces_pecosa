@@ -70,6 +70,26 @@ Route::resource(
     CustomerController::class
 );
 
+Route::get(
+    'customers/{customer}/sales/create',
+    [SaleController::class, 'createForCustomer']
+)->name('customers.sales.create');
+
+Route::post(
+    'customers/{customer}/sales',
+    [SaleController::class, 'storeForCustomer']
+)->name('customers.sales.store');
+
+Route::get(
+    'customers/{customer}/sales/create',
+    [SaleController::class,'createForCustomer']
+)->name('sales.customer.create');
+
+Route::post(
+    'customers/{customer}/sales',
+    [SaleController::class,'storeForCustomer']
+)->name('sales.customer.store');
+
 Route::resource(
     'sales',
     SaleController::class

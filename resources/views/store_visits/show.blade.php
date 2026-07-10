@@ -332,23 +332,107 @@
 
 
 
-    <div class="mt-6 bg-green-900/40 border border-green-700 rounded-lg p-5">
+        @php
+
+        $totalSurtido = $storeVisit->details->sum('supplied_quantity');
+
+        $totalRestante = $storeVisit->details->sum('remaining_quantity');
+
+        $totalVendido = $storeVisit->details->sum('sold_quantity');
+
+        $recuperacion = $storeVisit->details->sum(
+            fn($detail)=>
+            $detail->sold_quantity *
+            $detail->product->sale_price
+        );
+
+        $ganancia = $storeVisit->details->sum(
+            fn($detail)=>
+            $detail->sold_quantity *
+            $detail->product->profit
+        );
+
+    @endphp
 
 
-        <h2 class="text-2xl font-bold text-green-300">
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
 
 
-            💰 Recuperación total:
+        <div class="bg-slate-800 border border-slate-700 rounded-lg p-5">
 
-            ${{ number_format(
-                $storeVisit->details->sum(
-                    fn($detail)=>
-                    $detail->sold_quantity *
-                    $detail->product->sale_price
-                ),
-                2
-            ) }}
+            <p class="text-slate-400">
+                📦 Total surtido
+            </p>
 
+            <h3 class="text-2xl font-bold text-white">
+                {{ $totalSurtido }}
+            </h3>
+
+        </div>
+
+
+
+
+        <div class="bg-slate-800 border border-slate-700 rounded-lg p-5">
+
+            <p class="text-slate-400">
+                🏪 Total restante
+            </p>
+
+            <h3 class="text-2xl font-bold text-white">
+                {{ $totalRestante }}
+            </h3>
+
+        </div>
+
+
+
+
+
+        <div class="bg-slate-800 border border-slate-700 rounded-lg p-5">
+
+            <p class="text-slate-400">
+                🛒 Total vendido
+            </p>
+
+            <h3 class="text-2xl font-bold text-green-400">
+                {{ $totalVendido }}
+            </h3>
+
+        </div>
+
+
+
+
+
+        <div class="bg-green-900/40 border border-green-700 rounded-lg p-5">
+
+            <p class="text-green-300">
+                💰 Recuperación
+            </p>
+
+            <h3 class="text-2xl font-bold text-green-300">
+
+                ${{ number_format($recuperacion,2) }}
+
+            </h3>
+
+        </div>
+
+
+    </div>
+
+
+
+    <div class="mt-5 bg-blue-900/40 border border-blue-700 rounded-lg p-5">
+
+
+        <h2 class="text-xl font-bold text-blue-300">
+
+            📈 Ganancia estimada:
+
+            ${{ number_format($ganancia,2) }}
 
         </h2>
 
